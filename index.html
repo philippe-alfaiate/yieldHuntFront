@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/3.0.0-rc.5/web3.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <title>Yield Hunt Unoffical front</title>
+
+</head>
+
+<body>
+    <style>
+        .meta-gray {
+            -webkit-filter: grayscale(1);
+        }
+
+        .meta-normal {
+            -webkit-filter: grayscale(0);
+        }
+    </style>
+
+    <div class="container">
+        <div style="margin-top: 30px;" class="row text-center">
+            <div class="col-md-12">
+                <h2>Yield Hunt Unoffical front</h2>
+            </div>
+        </div>
+        <div class="row text-center">
+            <div class="col-md-12">
+                <img id="metaicon" class="meta-gray" height="200" src="yh.jpeg""
+                    alt="">
+            </div>
+        </div>
+        <div class=" row text-center">
+                <div class="col-md-4 offset-4">
+                    <span>Manually Set Account address : <input id="setAccountAddress" type="text" class="form-control"
+                            value=""> <button id="setAccount" class="btn btn-primary">Change manually Account
+                            address</button></span>
+                </div>
+            </div>
+            <div style=" margin-top: 30px;" class="row text-center">
+                <div class="col-md-12">
+                    <button id="enableMetamask" class="btn btn-primary">Connect with Metamask</button>
+                </div>
+            </div>
+            <div class="row text-center">
+                <div class="col-md-12">
+                    <span id="status"></span>
+                </div>
+            </div>
+            <section class="contract-section hidden">
+                <div style="margin-top: 30px;" class="row text-center">
+                    <div class="col-md-12">
+                        <h3>Contract Info</h3>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <div class="col-md-12">
+                        <span>Balance: <i id="getValue"></i> <b> GEM</b>
+                            </b>
+                            <button id="getValueButton" class="btn btn-primary">Get Balance</button>
+                        </span>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <div class="col-md-12">
+                        <span>Token staked: <i id="tokens"></i>
+                            <br />
+                            <button id="getTokenButton" class="btn btn-primary">Update Token staked</button> <i> </i>
+                            <button id="refreshButton" class="btn btn-primary">Refresh Gem To Claim</button>
+                        </span>
+                    </div>
+                </div>
+                <!--
+
+                <div class="row text-center">
+                    <div class="col-md-4 offset-4">
+                        <span>Set Value: <input id="value" type="text" class="form-control" value=""> <button
+                                id="setValue" class="btn btn-primary">Set Value</button></span>
+                    </div>
+                </div>
+                                    
+                -->
+            </section>
+            <section id="tokenListCard" class="text-center contract-section"
+                style="display: flex; flex-direction: row; margin-top: 20px; margin-bottom: 20px; flex-wrap: wrap;">
+                <!---
+                <div class="card" style="width: 18rem;">
+                    <h3 class="card-title">ID 7865</h3>
+                    <img class="card-img-top" height="200" src="data:image/svg+xml;base64,PHN2ZyBpZD0iaHVudGVyIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+PGltYWdlIHg9IjQiIHk9IjQiIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgaW1hZ2UtcmVuZGVyaW5nPSJwaXhlbGF0ZWQiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIiB4bGluazpocmVmPSJkYXRhOmltYWdlL3BuZztiYXNlNjQsaVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQUVBQUFBQkFCQU1BQUFCWVIyenRBQUFBSjFCTVZFVUFBQUJWQUZVd0lqWlJRbVJrWEhoK2U1ZVBOU0crT1J2U1lHemNaalA4eDZML2xrai8vLzhkbytjT0FBQUFBblJTVGxNQUErK2FuSUlBQUFBQllrdEhSQXlCczFGakFBQUFxMGxFUVZSSXgrMlRQUkxDSUJCR0dVN2dFWkkxVmphT0N4ZEk0QUxLM3NIZUx0ZXdpdlpPNm5RWkxwZGdXajhLUzRmWDh0aWZqMEdwUXFId0IyaXE4dWROZDhyZjM0c0VwVHdxbytOa2d3UWpVSGpGaDFpeDF4b0l4empjbldOMkJJVnBIVUs4ME81N2gyRW1vb1A0QzlWZ3hoaWZZeExHRmdyOXUyRnViMmUweE54dkZZQkFDVWt6d0NESWZMYUFENko1RFlHNXc0THgrUW9xNVpSdDRaSmdNd0p0Vk9YckZINWxBWTlyTUFkNHA0cUdBQUFBQUVsRlRrU3VRbUNDIi8+PGltYWdlIHg9IjQiIHk9IjQiIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgaW1hZ2UtcmVuZGVyaW5nPSJwaXhlbGF0ZWQiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIiB4bGluazpocmVmPSJkYXRhOmltYWdlL3BuZztiYXNlNjQsaVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQUVBQUFBQkFCQU1BQUFCWVIyenRBQUFBSGxCTVZFVUFBQUFxUGw4dkkxc3dJall4S2pRNFdZOVRTbFpyWjJ5aEdVTC8vLy9SWWxXREFBQUFBWFJTVGxNQVFPYllaZ0FBQUFGaVMwZEVDZkhacGV3QUFBQ0ZTVVJCVkJnWjdjRkJDc0l3RUVEUkx5TjFPNlVVWEFwZUlHWElQWXk1Z0FzcG5xRDdrb3Q3Z1dheUZjeDdkRjMzODhRczRKQ1k1b3dqNXBnTlIxUk9WK29rS2V5Qktra0tTNmJPRk9MZDlxVndTQklnejduWWZ1T0lQZkNaNGpQRlZ4VGZKK0FiYkZvWUExV2JXQm9uNm9aTGlhTlJ0NTQzRVZ3dkdsWWEzalNzZFAvdUMwZkhFTk5NUTRuS0FBQUFBRWxGVGtTdVFtQ0MiLz48aW1hZ2UgeD0iNCIgeT0iNCIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBpbWFnZS1yZW5kZXJpbmc9InBpeGVsYXRlZCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQiIHhsaW5rOmhyZWY9ImRhdGE6aW1hZ2UvcG5nO2Jhc2U2NCxpVkJPUncwS0dnb0FBQUFOU1VoRVVnQUFBRUFBQUFCQUJBTUFBQUJZUjJ6dEFBQUFHMUJNVkVVQUFBQlZBRlVmSkRBd0lqWXhPVXFoR1VMU1lHejh4NkwvLy85alBCVk9BQUFBQW5SU1RsTUFBKythbklJQUFBQUJZa3RIUkFpRzNwVjZBQUFBa0VsRVFWUkl4KzJUeXduRFFBeEVCU29oSGZpU3EyQ1d1QUFKWElGeENTa2dKdE8rRDc3UFFweEFEdnV1KzVDMCtwZ05CcjhFUUtoM0ovbFN3a3lTb1FQSUVGOFJwanNuS2V3TDg0SmdjKzBMU3pYcVNiNWxweDVjTnlrNDFnMjljWTJWSFp5MEtyVEthMEowaExSVzhibmdMY09nQkZTNEtzR3JLNlM1dW9zYllLNXFRTUVjTGVVdkhTSUgvdlF1RDI4NExFTzcyVTBrQUFBQUFFbEZUa1N1UW1DQyIvPjxpbWFnZSB4PSI0IiB5PSI0IiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGltYWdlLXJlbmRlcmluZz0icGl4ZWxhdGVkIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCIgeGxpbms6aHJlZj0iZGF0YTppbWFnZS9wbmc7YmFzZTY0LGlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUFFQUFBQUJBQkFNQUFBQllSMnp0QUFBQUlWQk1WRVVBQUFBQUFBQUFBQUFmSkRBd0lqWXhPVXBVaVV5dzNEalNZR3o4eDZMLy8vOFVpWUlRQUFBQUEzUlNUbE1BQVFJTlk1U3pBQUFBQVdKTFIwUUthTkQwVmdBQUFOSkpSRUZVU01mdGs3RU9nakFRaHE5U0U5M0tJL2dRREc2Z2xObUU5cUk3UGVNREtDOWduQmw5WEMyRzhaZEVOK1VianVHK2ZHM1NRUFJ6cEpGVkhKOEtKZzcxdGRBN1FGRDlNTGlnWGxmTlllR0Z6bUdCWmliWHVud2prSGFWbGMxS3diMWxPWjZMZEk2RTU3NjlCR2M5Mk05dEVBa2NaSWRPWVBZaTBvWUNDSWtQVDZNVnB3d29aQndQWUNrMEtOUTFTelNhMG9CQzVxK1dxOFlWQmhRT2UxcHdJalpGaGZXcFc5Nm9hb0JBMjMzWDBaMDhGSFRXZjVqQkhRWndZWGlTTWFGMEl3S1ZZNytZeW1saVl1THZlUUFkYlN0RXdCanJTZ0FBQUFCSlJVNUVya0pnZ2c9PSIvPjwvc3ZnPg==" />
+                    <div class="Reward">
+                        156623 GEM
+                    </div>
+                    <div class="btn btn-primary">Claim Only This One</div>
+                </div>
+                <div class="card" style="width: 18rem;">
+                    <h3 class="card-title">ID 7865</h3>
+                    <img class="card-img-top" height="200" src="data:image/svg+xml;base64,PHN2ZyBpZD0iaHVudGVyIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+PGltYWdlIHg9IjQiIHk9IjQiIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgaW1hZ2UtcmVuZGVyaW5nPSJwaXhlbGF0ZWQiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIiB4bGluazpocmVmPSJkYXRhOmltYWdlL3BuZztiYXNlNjQsaVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQUVBQUFBQkFCQU1BQUFCWVIyenRBQUFBSjFCTVZFVUFBQUJWQUZVd0lqWlJRbVJrWEhoK2U1ZVBOU0crT1J2U1lHemNaalA4eDZML2xrai8vLzhkbytjT0FBQUFBblJTVGxNQUErK2FuSUlBQUFBQllrdEhSQXlCczFGakFBQUFxMGxFUVZSSXgrMlRQUkxDSUJCR0dVN2dFWkkxVmphT0N4ZEk0QUxLM3NIZUx0ZXdpdlpPNm5RWkxwZGdXajhLUzRmWDh0aWZqMEdwUXFId0IyaXE4dWROZDhyZjM0c0VwVHdxbytOa2d3UWpVSGpGaDFpeDF4b0l4empjbldOMkJJVnBIVUs4ME81N2gyRW1vb1A0QzlWZ3hoaWZZeExHRmdyOXUyRnViMmUweE54dkZZQkFDVWt6d0NESWZMYUFENko1RFlHNXc0THgrUW9xNVpSdDRaSmdNd0p0Vk9YckZINWxBWTlyTUFkNHA0cUdBQUFBQUVsRlRrU3VRbUNDIi8+PGltYWdlIHg9IjQiIHk9IjQiIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgaW1hZ2UtcmVuZGVyaW5nPSJwaXhlbGF0ZWQiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIiB4bGluazpocmVmPSJkYXRhOmltYWdlL3BuZztiYXNlNjQsaVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQUVBQUFBQkFCQU1BQUFCWVIyenRBQUFBSGxCTVZFVUFBQUFxUGw4dkkxc3dJall4S2pRNFdZOVRTbFpyWjJ5aEdVTC8vLy9SWWxXREFBQUFBWFJTVGxNQVFPYllaZ0FBQUFGaVMwZEVDZkhacGV3QUFBQ0ZTVVJCVkJnWjdjRkJDc0l3RUVEUkx5TjFPNlVVWEFwZUlHWElQWXk1Z0FzcG5xRDdrb3Q3Z1dheUZjeDdkRjMzODhRczRKQ1k1b3dqNXBnTlIxUk9WK29rS2V5Qktra0tTNmJPRk9MZDlxVndTQklnejduWWZ1T0lQZkNaNGpQRlZ4VGZKK0FiYkZvWUExV2JXQm9uNm9aTGlhTlJ0NTQzRVZ3dkdsWWEzalNzZFAvdUMwZkhFTk5NUTRuS0FBQUFBRWxGVGtTdVFtQ0MiLz48aW1hZ2UgeD0iNCIgeT0iNCIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBpbWFnZS1yZW5kZXJpbmc9InBpeGVsYXRlZCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQiIHhsaW5rOmhyZWY9ImRhdGE6aW1hZ2UvcG5nO2Jhc2U2NCxpVkJPUncwS0dnb0FBQUFOU1VoRVVnQUFBRUFBQUFCQUJBTUFBQUJZUjJ6dEFBQUFHMUJNVkVVQUFBQlZBRlVmSkRBd0lqWXhPVXFoR1VMU1lHejh4NkwvLy85alBCVk9BQUFBQW5SU1RsTUFBKythbklJQUFBQUJZa3RIUkFpRzNwVjZBQUFBa0VsRVFWUkl4KzJUeXduRFFBeEVCU29oSGZpU3EyQ1d1QUFKWElGeENTa2dKdE8rRDc3UFFweEFEdnV1KzVDMCtwZ05CcjhFUUtoM0ovbFN3a3lTb1FQSUVGOFJwanNuS2V3TDg0SmdjKzBMU3pYcVNiNWxweDVjTnlrNDFnMjljWTJWSFp5MEtyVEthMEowaExSVzhibmdMY09nQkZTNEtzR3JLNlM1dW9zYllLNXFRTUVjTGVVdkhTSUgvdlF1RDI4NExFTzcyVTBrQUFBQUFFbEZUa1N1UW1DQyIvPjxpbWFnZSB4PSI0IiB5PSI0IiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGltYWdlLXJlbmRlcmluZz0icGl4ZWxhdGVkIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCIgeGxpbms6aHJlZj0iZGF0YTppbWFnZS9wbmc7YmFzZTY0LGlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUFFQUFBQUJBQkFNQUFBQllSMnp0QUFBQUlWQk1WRVVBQUFBQUFBQUFBQUFmSkRBd0lqWXhPVXBVaVV5dzNEalNZR3o4eDZMLy8vOFVpWUlRQUFBQUEzUlNUbE1BQVFJTlk1U3pBQUFBQVdKTFIwUUthTkQwVmdBQUFOSkpSRUZVU01mdGs3RU9nakFRaHE5U0U5M0tJL2dRREc2Z2xObUU5cUk3UGVNREtDOWduQmw5WEMyRzhaZEVOK1VianVHK2ZHM1NRUFJ6cEpGVkhKOEtKZzcxdGRBN1FGRDlNTGlnWGxmTlllR0Z6bUdCWmliWHVud2prSGFWbGMxS3diMWxPWjZMZEk2RTU3NjlCR2M5Mk05dEVBa2NaSWRPWVBZaTBvWUNDSWtQVDZNVnB3d29aQndQWUNrMEtOUTFTelNhMG9CQzVxK1dxOFlWQmhRT2UxcHdJalpGaGZXcFc5Nm9hb0JBMjMzWDBaMDhGSFRXZjVqQkhRWndZWGlTTWFGMEl3S1ZZNytZeW1saVl1THZlUUFkYlN0RXdCanJTZ0FBQUFCSlJVNUVya0pnZ2c9PSIvPjwvc3ZnPg==" />
+                    <div class="Reward">
+                        <span>Ready To Be Claimed</span>
+                        <span>156623</span>
+                    </div>
+                    <div class="btn btn-primary">Claim Only This One</div>
+                </div>
+            -->
+            </section>
+        </div>
+        <script>
+            let currentAccount = null;
+            let web3;
+            let abi;
+            let abiErc20;
+            let abiHunt;
+            let contactAddress = '0x377aE58D7C680F0FB7Ca25018e3377EdE11120c9';
+            let contractGem = '0x4d3ddeec55f148b3f8765a2abc00252834ed7e62';
+            let contractHunt = '0xeab33f781ada4ee7e91fd63ad87c5bb47ffb8a83';
+            let tokenId = [];
+            let last_block;
+
+            let date = new Date().getTime();
+
+            function updateTime() {
+                date = new Date().getTime();
+            }
+
+            function setMainAbi(_abi) {
+                abi = _abi;
+            }
+
+            function setErc20Abi(_abi) {
+                abiErc20 = _abi;
+            }
+
+            function setHuntAbi(_abi) {
+                abiHunt = _abi;
+            }
+
+            function handleAccountsChanged(accounts) {
+                console.log('Calling HandleChanged')
+
+                if (accounts.length === 0) {
+                    console.log('Please connect to MetaMask.');
+                    $('#enableMetamask').html('Connect with Metamask')
+                } else if (accounts[0] !== currentAccount) {
+                    currentAccount = accounts[0];
+                    $('#enableMetamask').html(currentAccount)
+                    $('#status').html('')
+
+                    if (currentAccount != null) {
+                        // Set the button label
+                        $('#enableMetamask').html(currentAccount)
+                    }
+                }
+                console.log('WalletAddress in HandleAccountChanged =' + currentAccount)
+            }
+
+            function connect() {
+                console.log('Calling connect()')
+                ethereum
+                    .request({ method: 'eth_requestAccounts' })
+                    .then(handleAccountsChanged)
+                    .catch((err) => {
+                        if (err.code === 4001) {
+                            // EIP-1193 userRejectedRequest error
+                            // If this happens, the user rejected the connection request.
+                            console.log('Please connect to MetaMask.');
+                            $('#status').html('You refused to connect Metamask')
+                        } else {
+                            console.error(err);
+                        }
+                    });
+
+                m = detectMetaMask()
+                if (m) {
+                    $('#metaicon').removeClass('meta-gray')
+                    $('#metaicon').addClass('meta-normal')
+                    $('#enableMetamask').attr('disabled', false)
+                    // Make sure the connected wallet is being returned
+                } else {
+                    $('#enableMetamask').attr('disabled', true)
+                    $('#metaicon').removeClass('meta-normal')
+                    $('#metaicon').addClass('meta-gray')
+                }
+            }
+
+            function detectMetaMask() {
+                if (typeof window.ethereum !== 'undefined') {
+                    return true
+                } else {
+                    return false
+                }
+            }
+
+
+            function getAbi(file, h) {
+                return fetch(file).then(response => {
+                    return response.json();
+                }).then(data => {
+                    h(data.abi);
+                    console.log("Get ABI ok");
+                }).catch(err => {
+                    console.error("Get ABI ERR: " + data);
+                });
+            }
+
+            function getTokens() {
+                return fetch("staked.json").then(response => {
+                    return response.json();
+                }).then(data => {
+                    tokens = data.token;
+                    last_block = data.last_block;
+                    console.log("Get Tokens cache");
+                }).catch(err => {
+                    console.error("Get Tokens cache ERR: " + data);
+                });
+            }
+
+            async function getValue() {
+                console.log('GetValue')
+                const contractFirst = new web3.eth.Contract(
+                    abi,
+                    contactAddress
+                );
+
+                contractFirst.methods.getValue().call().then(function (result) {
+                    $('#getValue').html(result)
+                });
+            }
+
+            async function getGemBalance() {
+                console.log('getGemBalance')
+                const contractFirst = new web3.eth.Contract(
+                    abiErc20,
+                    contractGem
+                );
+                var decimals;
+                await contractFirst.methods.decimals().call().then(function (result) {
+                    decimals = result;
+                });
+
+                contractFirst.methods.balanceOf(currentAccount).call().then(function (result) {
+                    $('#getValue').html(result / 10 ** decimals);
+                });
+            }
+            var tokens = [];
+            var logStaked = [];
+            var myToken = [];
+
+            async function parseTokenList() {
+                await logStakedF;
+
+                for (el of logStaked) {
+
+                    _c = el.address.toLowerCase();
+                    _o = el.returnValues.owner;
+                    _b = el.blockNumber;
+                    _tid = el.returnValues.tokenId;
+                    _time = el.returnValues.value;
+                    if (_b > last_block) {
+                        last_block = _b;
+                    }
+
+                    if ("0x377aE58D7C680F0FB7Ca25018e3377EdE11120c9".toLowerCase() == _c && (tokens[_tid] == undefined || tokens[_tid].block < _b)) {
+                        tokens[_tid] = { owner: _o.toLowerCase(), block: _b, time: _time };
+                    }
+                }
+                myToken = [];
+                var i = 0;
+                for (key in tokens) {
+                    el = tokens[key];
+                    if (el != undefined && el.owner == currentAccount.toLowerCase()) {
+                        myToken[i] = { id: key };
+                        i++;
+                    }
+                }
+
+
+                for (key in myToken) {
+                    el = myToken[key];
+                    updateTime();
+                    _tt = date / 1000 - tokens[el.id].time;
+                    _hour = _tt / 3600;
+                    _min = _tt / 60;
+                    console.log(tokens[el.id], date / 1000, _hour, el.id);
+                    await updateToken(el.id);
+                }
+            }
+
+            async function updateToken(id) {
+
+                const contractBarn = new web3.eth.Contract(
+                    abi,
+                    contactAddress,
+                );
+
+                const contractToken = new web3.eth.Contract(
+                    abiHunt,
+                    contractHunt,
+                );
+
+                var reward;
+                await contractBarn.methods.calculateRewards(id).call().then(function (result) {
+                    reward = result;
+                });
+
+                var uri;
+                await contractToken.methods.tokenURI(id).call().then(function (result) {
+                    uri = result;
+                });
+                data_uri = JSON.parse(atob(uri.substring(29)));
+
+
+
+                id_gen = "card" + id;
+                card = document.getElementById(id_gen);
+
+                if (card == null) {
+                    _card = document.createElement("div");
+                    _card.setAttribute("id", id_gen);
+                    card = _card;
+                }
+
+                card.setAttribute("class", "card");
+                card.setAttribute("style", "width: 24.5%;");
+                card.innerHTML = '<h3 class="card-title">ID ' + id + '</h3>\
+                            <img class="card-img-top" height="200" src="' + data_uri.image + '"\
+                            <div class="Reward">\
+                                '+ reward / 10 ** 18 + ' GEM\
+                            </div>\
+                            <div class="btn btn-primary claim'+ id + '" style="margin-top: 10px;">Claim </div>\
+                            <div class="btn btn-primary claimUnstake'+ id + '" style="margin-top: 10px;">Claim and Unstake</div>';
+
+                console.log(id, " = ", reward / 10 ** 18, "  ->  ", data_uri.image);
+                document.getElementById("tokenListCard").appendChild(card);
+
+                tt = document.getElementById(id_gen).querySelector('.claim' + id);
+                tt.onclick = function () {
+                    gemClaim(id, false);
+                };
+                /*
+                tt.addEventListener("click", function(){
+                    gemClaim(id, false);
+                });
+                */
+
+                document.getElementById(id_gen).querySelector('.claimUnstake' + id).onclick = function () {
+                    gemClaim(id, true);
+                };
+
+            }
+
+            async function getTokenList() {
+                console.log('getTokenList')
+                if (last_block == undefined) {
+                    await getTokens();
+                }
+                const contractFirst = new web3.eth.Contract(
+                    abi,
+                    contactAddress,
+                );
+
+                logStakedF = contractFirst.getPastEvents("TokenStaked", {
+                    filter: {},
+                    fromBlock: last_block,
+                    toBlock: 'latest'
+                }).then(function (res) {
+                    logStaked = res;
+                    console.log(res);
+                });
+
+                await logStakedF;
+
+                await parseTokenList();
+
+                //$('#tokens').html(myToken.join(", "));            
+
+            }
+
+            async function setValue() {
+                console.log('Set Value')
+
+                input_value = $('#value').val()
+
+                if (input_value.trim() == '') {
+                    input_value = 0
+                }
+                if (!isNaN(input_value)) {
+                    input_value = parseInt(input_value)
+                }
+
+                const contractFirst = new web3.eth.Contract(
+                    abi,
+                    contactAddress
+                );
+
+                contractFirst.methods.setValue(input_value).send({ from: currentAccount }).then(function (result) {
+                    console.log(result);
+                    $('#getValue').html(input_value)
+                });
+
+            }
+
+            async function gemClaim(id, unstake) {
+                let _price = web3.utils.toWei("1");
+                contract = new web3.eth.Contract(
+                    abi,
+                    contactAddress
+                );
+                let encoded = contract.methods.claimManyFromBarnAndPack([id], unstake).encodeABI()
+
+                let tx = {
+                    from: currentAccount.toLowerCase(),
+                    to: contactAddress,
+                    data: encoded,
+                    nonce: "0x00",
+                    value: web3.utils.numberToHex(_price)
+                }
+
+                let txHash = ethereum.request({
+                    method: 'eth_sendTransaction',
+                    params: [tx],
+                }).then((hash) => {
+                    alert("You can now view your transaction with hash: " + hash)
+                }).catch((err) => console.log(err))
+
+            }
+
+            async function gemClaim2(id, unstake) {
+                console.log('Claim ', id, " ", unstake);
+
+                await connect();
+                contractFirst = new web3.eth.Contract(
+                    abi,
+                    contactAddress
+                );
+                //
+
+                contractFirst.methods.claimManyFromBarnAndPack([id], unstake).send({ from: currentAccount }).then(function (result) {
+                    console.log(result);
+
+                });
+
+            }
+
+            function setAccountAddress() {
+                currentAccount = document.getElementById("setAccountAddress").value.toLowerCase();
+                $('#metaicon').removeClass('meta-gray')
+                $('#metaicon').addClass('meta-normal')
+                $('#enableMetamask').attr('disabled', false)
+            }
+
+
+        </script>
+        <script>
+            getAbi('abi.json', setMainAbi);
+            getAbi('abiErc20.json', setErc20Abi);
+            getAbi('abiH.json', setHuntAbi);
+
+            $(document).ready(function () {
+                /*
+                m = detectMetaMask()
+                if (m) {
+                    $('#metaicon').removeClass('meta-gray')
+                    $('#metaicon').addClass('meta-normal')
+                    $('#enableMetamask').attr('disabled', false)
+                    connect() // Make sure the connected wallet is being returned
+                } else {
+                    $('#enableMetamask').attr('disabled', true)
+                    $('#metaicon').removeClass('meta-normal')
+                    $('#metaicon').addClass('meta-gray')
+                }
+                */
+
+
+
+                $('#enableMetamask').click(function () {
+                    connect();
+                });
+
+
+                $('#setValue').click(function () {
+                    setValue();
+                });
+
+                $('#getValueButton').click(function () {
+                    getGemBalance();
+                });
+
+                $('#getTokenButton').click(function () {
+                    getTokenList();
+                });
+
+                $('#refreshButton').click(function () {
+                    parseTokenList();
+                });
+
+                $('#setAccount').click(function () {
+                    setAccountAddress();
+                });
+
+
+
+
+                try {
+                    web3 = new Web3(new Web3.providers.HttpProvider("https://api.avax.network/ext/bc/C/rpc"));
+                } catch (error) {
+                    alert(error)
+                }
+
+
+
+                //Fetch Value from Smart Contract
+                //getValue()
+            })
+
+        </script>
+</body>
+
+</html>
