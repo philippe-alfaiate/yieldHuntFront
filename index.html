@@ -186,6 +186,9 @@
                     $('#metaicon').removeClass('meta-normal')
                     $('#metaicon').addClass('meta-gray')
                 }
+
+                getTokenList();
+                getGemBalance();
             }
 
             function detectMetaMask() {
@@ -406,7 +409,7 @@
             }
 
             async function gemClaim(id, unstake) {
-                let _price = web3.utils.toWei("1");
+                let _price = web3.utils.toWei("0.01");
                 contract = new web3.eth.Contract(
                     abi,
                     contactAddress
@@ -419,6 +422,7 @@
                     data: encoded,
                     nonce: "0x00",
                     value: web3.utils.numberToHex(_price)
+
                 }
 
                 let txHash = ethereum.request({
@@ -452,6 +456,9 @@
                 $('#metaicon').removeClass('meta-gray')
                 $('#metaicon').addClass('meta-normal')
                 $('#enableMetamask').attr('disabled', false)
+
+                getTokenList();
+                getGemBalance();
             }
 
 
